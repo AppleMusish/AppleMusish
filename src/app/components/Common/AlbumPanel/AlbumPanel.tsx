@@ -158,6 +158,9 @@ class AlbumPanel extends React.Component<AlbumPanelProps, AlbumPanelState> {
       album.attributes.artistName
     );
 
+    const albumGenre = album.attributes.genreNames[0];
+    const albumYear = album.attributes.releaseDate.split('-')[0];
+
     return (
       <div className={cx(classes.panel, this.props.className)} ref={this.panelRef}>
         <div className={classes.aside}>
@@ -186,6 +189,9 @@ class AlbumPanel extends React.Component<AlbumPanelProps, AlbumPanelState> {
           </span>
 
           <span className={classes.subtitle}>{artistName}</span>
+          <span className={classes.subtitle}>
+            {album.attributes.isComplete ? `${albumGenre} - ${albumYear}` : 'Upcoming Album'}
+          </span>
 
           {album.attributes.editorialNotes && album.attributes.editorialNotes.standard && (
             <div className={classes.description} onClick={this.toggleFullDescription}>
