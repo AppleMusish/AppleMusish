@@ -20,6 +20,10 @@ import {
 } from '../../../utils/Utils';
 import { AuthorizeContext } from '../../Providers/AuthorizeProvider';
 import { LyricsModalProps, withLyricsModal } from '../../Providers/LyricsModalProvider';
+import {
+  mediaSessionSetAction,
+  mediaSessionSetMetadata,
+} from '../../Providers/MediaSessionProvider';
 import { ModalProviderValue, withModal } from '../../Providers/ModalProvider';
 import { QueueModalProps, withQueueModal } from '../../Providers/QueueProvider';
 import AlbumPanel from '../AlbumPanel/AlbumPanel';
@@ -48,6 +52,13 @@ class Player extends React.Component<PlayerProps> {
     Mousetrap.bind('left', this.handlePrevious, 'keyup');
     Mousetrap.bind('right', this.handleNext, 'keyup');
     Mousetrap.bind('space', togglePlayback, 'keyup');
+
+    mediaSessionSetAction('play', play);
+    mediaSessionSetAction('pause', pause);
+    mediaSessionSetAction('nexttrack', this.handleNext);
+    mediaSessionSetAction('previoustrack', this.handlePrevious);
+    mediaSessionSetAction('seekforward', this.handleSeekForward);
+    mediaSessionSetAction('seekbackward', this.handleSeekBackward);
   }
 
   public handlePrevious = () => {
@@ -67,6 +78,20 @@ class Player extends React.Component<PlayerProps> {
     if (player.repeatMode === 1) {
       player.seekToTime(0);
     }
+  };
+
+  public handleSeekForward = () => {
+    const seekTimeInSeconds = 5;
+    const { player } = this.props.mk.instance;
+    player.seekToTime(
+      Math.min(player.currentPlaybackTime + seekTimeInSeconds, player.currentPlaybackDuration),
+    );
+  };
+
+  public handleSeekBackward = () => {
+    const { player } = this.props.mk.instance;
+    const seekTimeInSeconds = 5;
+    player.seekToTime(Math.max(player.currentPlaybackTime - seekTimeInSeconds, 0));
   };
 
   public handleRepeat = () => {
@@ -138,6 +163,10 @@ class Player extends React.Component<PlayerProps> {
     ) : (
       <span className={cx(styles.albumName)}>{nowPlayingItem.attributes.albumName}</span>
     );
+
+    if (hasMeta) {
+      mediaSessionSetMetadata(nowPlayingItem);
+    }
 
     return (
       <div className={styles.player}>
